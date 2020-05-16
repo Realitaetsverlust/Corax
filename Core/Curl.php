@@ -1,6 +1,6 @@
 <?php
 
-namespace Realitaetsverlust\RavenDBAdapter\Core;
+namespace Realitaetsverlust\Corax\Core;
 
 class Curl {
     public $curl;
