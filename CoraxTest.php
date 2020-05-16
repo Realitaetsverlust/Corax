@@ -1,13 +1,12 @@
 <?php
-
-use Realitaetsverlust\Corax\Core\Corax;
-
-require "Core/Corax.class.php";
-
 ini_set('display_errors', true);
 error_reporting(E_ALL);
 
-$raven = new Corax(
+require "Core/Corax.class.php";
+
+use Realitaetsverlust\Corax\Core\Corax;
+
+$corax = new Corax(
     "https://a.realitaetsverlust.ravendb.community:8803",
     "testing",
     "certs/admin.client.certificate.realitaetsverlust.pem",
@@ -15,5 +14,5 @@ $raven = new Corax(
 );
 
 echo "<pre>";
-var_dump($raven->testQuery());
+$corax->getAllDocuments(0, 10);
 echo "</pre>";

@@ -5,7 +5,7 @@ namespace Realitaetsverlust\Corax\Core;
 class Curl {
     public $curl;
 
-    public function __construct($url, $certFile, $certPass, $requestType) {
+    public function __construct($url, $certFile, $certPass) {
         $this->curl = curl_init($url);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, '2');
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, '1');
@@ -14,10 +14,17 @@ class Curl {
         curl_setopt($this->curl, CURLOPT_CERTINFO, true);
         curl_setopt($this->curl, CURLOPT_SSLCERT, $certFile);
         curl_setopt($this->curl, CURLOPT_SSLCERTPASSWD, $certPass);
-        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $requestType);
 
         $logfile = fopen(getcwd()."/logs/curl.log", "a");
         curl_setopt($this->curl, CURLOPT_STDERR, $logfile);
+    }
+
+    public function setRequestType(string $requestType) {
+        curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $requestType);
+    }
+
+    public function setRequestData(array $data) {
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode($data));
     }
 
     public function exec() {

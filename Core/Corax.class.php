@@ -7,6 +7,10 @@ require "Curl.php";
  * Simple class to connect to RavenDB instance
  */
 class Corax {
+    public const PUT = "PUT";
+    public const GET = "GET";
+    public const DELETE = "DELETE";
+
     /**
      * Server IP
      * @var string
@@ -32,10 +36,10 @@ class Corax {
     public string $certPass;
 
     /**
-     * URL to the chosen database
+     * UrlBuilder utility
      * @var string
      */
-    public string $baseUrl;
+    public string $urlBuilder;
 
     /**
      * RavenDB constructor.
@@ -50,19 +54,48 @@ class Corax {
         $this->database = $database;
         $this->certPath = getcwd()."/".$certPath;
         $this->certPass = $certPass;
-        $this->baseUrl = $this->server . "/databases";
     }
 
-    public function testQuery() {
-        $curl = new Curl($this->baseUrl, $this->certPath, $this->certPass, "GET");
+    public function start(int $startAt) {
+        $requestType = "GET";
+        $command = "start={$startAt}";
+    }
+
+    public function pageSize(int $pageSize) {
+        $requestType = "GET";
+        $command = "pageSize={$pageSize}";
+    }
+
+    public function getDocumentById(string $id) {
+        $requestType = "GET";
+        $command = "id={$id}";
+    }
+
+    public function getAllDocuments($startAt, $pageSize) {
+        return $this->executeQuery($this->buildUrl(["startAt" => $startAt, "pageSize" => $pageSize]), Corax::GET);
+    }
+
+    public function putDocument(string $id, array $data) {
+        return $this->executeQuery($this->buildUrl(["id" => $id]), Corax::PUT, $data);
+    }
+
+    private function executeQuery(string $targetUrl, string $requestType, array $data = []) {
+        $curl = new Curl($targetUrl, $this->certPath, $this->certPass);
+        $curl->setRequestType($requestType);
+        $curl->setRequestData($data);
         $response = $curl->exec();
-        $curl->close();
 
-        echo($response);
-        exit();
+        return $response;
+    }
 
-        curl_close($curl);
+    public function buildUrl(array $buildParams = []) {
+        $baseUrl = "{$this->server}/databases/{$this->database}/docs?";
 
-        return false;
+        $queryString = '';
+        foreach($buildParams as $key => $value) {
+            $queryString .= "{$key}={$value}&";
+        }
+
+        return $baseUrl . $queryString;
     }
 }
