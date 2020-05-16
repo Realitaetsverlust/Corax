@@ -2,7 +2,7 @@
 
 use Realitaetsverlust\RavenDBAdapter\Core\RavenDB;
 
-require "RavenDBAdapter.class.php";
+require "Core/RavenDB.class.php";
 
 ini_set('display_errors', true);
 error_reporting(E_ALL);
