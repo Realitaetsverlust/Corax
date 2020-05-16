@@ -56,23 +56,23 @@ class Corax {
         $this->certPass = $certPass;
     }
 
-    public function start(int $startAt) {
-        $requestType = "GET";
-        $command = "start={$startAt}";
-    }
-
-    public function pageSize(int $pageSize) {
-        $requestType = "GET";
-        $command = "pageSize={$pageSize}";
-    }
-
     public function getDocumentById(string $id) {
         $requestType = "GET";
         $command = "id={$id}";
     }
 
-    public function getAllDocuments($startAt, $pageSize) {
-        return $this->executeQuery($this->buildUrl(["startAt" => $startAt, "pageSize" => $pageSize]), Corax::GET);
+    public function getAllDocuments($startAt = null, $pageSize = null) {
+        $params = [];
+
+        if($startAt !== null) {
+            $params['startAt'] = $startAt;
+        }
+
+        if($pageSize !== null) {
+            $params['pageSize'] = $pageSize;
+        }
+
+        return $this->executeQuery($this->buildUrl($params), Corax::GET);
     }
 
     public function putDocument(string $id, array $data) {
