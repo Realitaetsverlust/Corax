@@ -36,12 +36,6 @@ class Corax {
     public string $certPass;
 
     /**
-     * UrlBuilder utility
-     * @var string
-     */
-    public string $urlBuilder;
-
-    /**
      * RavenDB constructor.
      *
      * @param string $server
@@ -56,11 +50,11 @@ class Corax {
         $this->certPass = $certPass;
     }
 
-    public function getDocumentById(string $id) {
-        return $this->executeQuery($this->buildUrl(["id" => $id]), Corax::GET);
+    public function getDocumentById(array $ids):string {
+        return $this->executeQuery($this->buildUrl($ids), Corax::GET);
     }
 
-    public function getAllDocuments($startAt = null, $pageSize = null) {
+    public function getAllDocuments($startAt = null, $pageSize = null):string {
         $params = [];
 
         if($startAt !== null) {
@@ -74,24 +68,35 @@ class Corax {
         return $this->executeQuery($this->buildUrl($params), Corax::GET);
     }
 
-    public function putDocument(string $id, array $data) {
-        return $this->executeQuery($this->buildUrl(["id" => $id]), Corax::PUT, $data);
+    public function putDocument(string $id, array $data):string {
+        return $this->executeQuery($this->buildUrl(["documentId" => $id]), Corax::PUT, $data);
     }
 
-    private function executeQuery(string $targetUrl, string $requestType, array $data = []) {
+    private function executeQuery(string $targetUrl, string $requestType, array $data = []):string {
         $curl = new Curl($targetUrl, $this->certPath, $this->certPass);
         $curl->setRequestType($requestType);
         $curl->setRequestData($data);
-        $response = $curl->exec();
-
-        return $response;
+        return $curl->exec();
     }
 
-    public function buildUrl(array $buildParams = []) {
+    private function buildUrl(array $buildParams = []):string {
         $baseUrl = "{$this->server}/databases/{$this->database}/docs?";
 
         $queryString = '';
         foreach($buildParams as $key => $value) {
+            /*
+             * You're probably wondering "what the fuck is happening here?"
+             * Well, RavenDB makes it possible to search for multiple IDs. And in the URL,
+             * they are all called "id". Now, sadly, we can't have multiple keys with the same
+             * name in an array. Therefore, I'm just checking if something is called
+             * documentId and I replace that with "id" so the string looks correctly. That's also
+             * the reason why I'm using "documentId" and not just "id" - that string can appear in
+             * other params, so to avoid conflicts and wrong positives, I'm using documentId.
+            */
+            if(strpos($key, "documentId") >= 1) {
+                $key = "id";
+            }
+
             $queryString .= "{$key}={$value}&";
         }
 
