@@ -57,8 +57,7 @@ class Corax {
     }
 
     public function getDocumentById(string $id) {
-        $requestType = "GET";
-        $command = "id={$id}";
+        return $this->executeQuery($this->buildUrl(["id" => $id]), Corax::GET);
     }
 
     public function getAllDocuments($startAt = null, $pageSize = null) {

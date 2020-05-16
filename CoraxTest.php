@@ -14,5 +14,5 @@ $corax = new Corax(
 );
 
 echo "<pre>";
-$corax->getAllDocuments(0, 10);
+var_dump($corax->getDocumentById("testdata/1"));
 echo "</pre>";
