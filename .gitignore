@@ -93,5 +93,7 @@ fabric.properties
 # End of https://www.gitignore.io/api/phpstorm
 
 # Custom
-!/certs/
+!/certs/.gitkeep
 /certs/*
+!/logs/.gitkeep
+/logs/*

@@ -1,6 +1,8 @@
 <?php
+namespace Realitaetsverlust\RavenDBAdapter\Core;
 
-namespace RavenDB;
+require "Curl.php";
+
 /**
  * Simple class to connect to RavenDB instance
  */
@@ -24,6 +26,12 @@ class RavenDB {
     public string $certPath;
 
     /**
+     * Pass for certificate
+     * @var string
+     */
+    public string $certPass;
+
+    /**
      * URL to the chosen database
      * @var string
      */
@@ -32,31 +40,25 @@ class RavenDB {
     /**
      * RavenDB constructor.
      *
-     * @param $server string
-     * @param $database string
-     * @param $certPath string
+     * @param string $server
+     * @param string $database
+     * @param string $certPath
+     * @param string $certPass
      */
-    public function __construct(string $server, string $database, string $certPath = "") {
+    public function __construct(string $server, string $database, string $certPath = "", string $certPass = "") {
         $this->server = $server;
         $this->database = $database;
-        $this->certPath = $certPath;
-        $this->baseUrl = $this->server . "/databases/" . $this->database;
+        $this->certPath = getcwd()."/".$certPath;
+        $this->certPass = $certPass;
+        $this->baseUrl = $this->server . "/databases";
     }
 
     public function testQuery() {
-        $curl = curl_init($this->baseUrl);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, '2');
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, '1');
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($curl, CURLOPT_SSLCERT, $this->certPath);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $curl = new Curl($this->baseUrl, $this->certPath, $this->certPass, "GET");
+        $response = $curl->exec();
+        $curl->close();
 
-        $response = curl_exec($curl);
-
-        echo "<pre>";
-        var_dump($response);
-        var_dump(curl_errno($curl));
-        echo "</pre>";
+        echo($response);
         exit();
 
         curl_close($curl);
