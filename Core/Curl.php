@@ -19,20 +19,22 @@ class Curl {
         curl_setopt($this->curl, CURLOPT_STDERR, $logfile);
     }
 
-    public function setRequestType(string $requestType) {
+    public function setRequestType(string $requestType):void {
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $requestType);
     }
 
-    public function setRequestData(array $data) {
+    public function setRequestData(array $data):void {
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode($data));
     }
 
-    public function exec() {
+    public function exec():string {
         $result = curl_exec($this->curl);
 
         if($errno = curl_errno($this->curl)) {
             var_dump($this->getErrorString($errno));
         }
+
+        $this->close();
 
         return $result;
     }
@@ -41,7 +43,7 @@ class Curl {
         curl_close($this->curl);
     }
 
-    public function getErrorString($errorNumber) {
+    public function getErrorString($errorNumber):string {
         return [
             1 => 'CURLE_UNSUPPORTED_PROTOCOL',
             2 => 'CURLE_FAILED_INIT',

@@ -9,6 +9,7 @@ require "Curl.php";
 class Corax {
     public const PUT = "PUT";
     public const GET = "GET";
+    public const POST = "POST";
     public const DELETE = "DELETE";
 
     /**
@@ -54,6 +55,10 @@ class Corax {
         return $this->executeQuery($this->buildUrl($ids), Corax::GET);
     }
 
+    public function getDocumentByPrefix(string $prefix):string {
+        return $this->executeQuery($this->buildUrl(['startsWith' => $prefix]), Corax::GET);
+    }
+
     public function getAllDocuments($startAt = null, $pageSize = null):string {
         $params = [];
 
@@ -72,11 +77,19 @@ class Corax {
         return $this->executeQuery($this->buildUrl(["documentId" => $id]), Corax::PUT, $data);
     }
 
+    public function runQuery(string $query):string {
+        return $this->executeQuery($this->buildQueryUrl(), Corax::POST, ['Query' => $query]);
+    }
+
     private function executeQuery(string $targetUrl, string $requestType, array $data = []):string {
         $curl = new Curl($targetUrl, $this->certPath, $this->certPass);
         $curl->setRequestType($requestType);
         $curl->setRequestData($data);
         return $curl->exec();
+    }
+
+    private function buildQueryUrl():string {
+        return "{$this->server}/databases/{$this->database}/queries";
     }
 
     private function buildUrl(array $buildParams = []):string {

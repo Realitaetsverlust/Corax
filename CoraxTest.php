@@ -14,5 +14,5 @@ $corax = new Corax(
 );
 
 echo "<pre>";
-var_dump($corax->getDocumentById("testdata/1"));
+var_dump(json_decode($corax->getDocumentByPrefix('no')));
 echo "</pre>";
