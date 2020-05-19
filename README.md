@@ -1,19 +1,19 @@
-#Corax
-###A RavenDB-Connector for PHP utilizing the REST-API
+# Corax
+### A RavenDB-Connector for PHP utilizing the REST-API
 
 Corax is an extremely small, independent library for PHP offering you various methods for writing and retrieving data from a RavenDB instance.
 
-###Attention:
+### Attention:
 This library is not finished by any means necessary. If you stumble across it for whatever reason, please keep that in mind and for the love of god, please don't use it productively yet. Give me a few weeks.
 
-####Requirements:
+#### Requirements:
 
 - PHP > 7.4
 - PHP cURL Extension
 - OpenSSL
 - An installed RavenDB instance
 
-####Usage:
+#### Usage:
 
 Opening a Corax-Instance is fairly simple:
 ```
@@ -37,24 +37,24 @@ Corax currently supports 4 operations:
 - Creating new documents
 - Deleting documents
 
-###Example usage
+### Example usage
 
-######Fetch all documents:
+###### Fetch all documents:
 ``$corax->getAllDocuments(5, 10);``
 
 Corax will fetch all the documents, starting with the 5th, and returning up to 10 documents.
 
-######Fetch documents by ID:
+###### Fetch documents by ID:
 ``$corax->getDocumentById(["testdata/1", "testdata/2"]);``
 
 Corax will fech the documents with the ID "testdata/1" and "testdata/2". Please not that, even if you only want one document, you still have to hand an array into the function.
 
-######Creating a new document:
+###### Creating a new document:
 ``$corax->putDocument("testdata/99", ['name' => 'Jeff']);``
 
 Creates a new document with the Id "testdata/99" and the content handed in the second param. Please note, you will always have to hand an array into the function. Corax will perform the JSON-Encoding itself.
 
-######Deleting a document
+###### Deleting a document
 ``$corax->deleteDocument("testdata/1);``
 
 Does exactly what you'd think it does.
