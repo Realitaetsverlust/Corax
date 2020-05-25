@@ -10,6 +10,7 @@ This library is not finished by any means necessary. If you stumble across it fo
 
 - PHP > 7.4
 - PHP cURL Extension
+- PHP YAML Extension
 - OpenSSL
 - An installed RavenDB instance
 
@@ -17,12 +18,7 @@ This library is not finished by any means necessary. If you stumble across it fo
 
 Opening a Corax-Instance is fairly simple:
 ```
-$corax = new Corax(
-    "https://your-server-url.com:port",
-    "database_name",
-    "path/to/your/keyfile.pem",
-    "passphrase for the keyfile"
-);
+$corax = new Corax('path/to/config.yaml');
 ```
 
 There are a few things to note here:

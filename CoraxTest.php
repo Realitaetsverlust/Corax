@@ -6,12 +6,7 @@ require_once 'vendor/autoload.php';
 
 use Realitaetsverlust\Corax\Core\Corax;
 
-$corax = new Corax(
-    "https://a.realitaetsverlust.ravendb.community:8803",
-    "testing",
-    "certs/admin.client.certificate.realitaetsverlust.pem",
-    "realitaetsverlust"
-);
+$corax = new Corax('/var/www/html/RavenDBAdapter/corax.yml');
 
 echo "<pre>";
 var_dump($corax->documentExists('testdata/1'));

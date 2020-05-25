@@ -47,11 +47,13 @@ class Corax {
      * @param string $certPath path to the certificate
      * @param string $certPass the password for the certfile (optional)
      */
-    public function __construct(string $server, string $database, string $certPath = "", string $certPass = "") {
-        $this->server = $server;
-        $this->database = $database;
-        $this->certPath = getcwd()."/".$certPath;
-        $this->certPass = $certPass;
+    public function __construct(string $configPath) {
+        $config = yaml_parse_file($configPath)['config'];
+        
+        $this->server = $config['serverAddress'];
+        $this->database = $config['database'];
+        $this->certPath = getcwd()."/".$config['certFilePath'];
+        $this->certPass = $config['certFilePassword'];
     }
 
     /**

@@ -1,0 +1,5 @@
+config:
+  serverAddress: 'https://serveraddress:port'
+  database: 'exampledatabase'
+  certFilePath: 'path/to/certfile'
+  certFilePassword: 'passphrase for certfile'
