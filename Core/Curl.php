@@ -2,9 +2,18 @@
 
 namespace Realitaetsverlust\Corax\Core;
 
+use Realitaetsverlust\Corax\Core\Exceptions\CurlCertException;
+use Realitaetsverlust\Corax\Core\Exceptions\CurlException;
+
 class Curl {
     public $curl;
 
+    /**
+     * Curl constructor.
+     * @param $url
+     * @param $certFile
+     * @param $certPass
+     */
     public function __construct($url, $certFile, $certPass) {
         $this->curl = curl_init($url);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, '2');
@@ -19,30 +28,59 @@ class Curl {
         curl_setopt($this->curl, CURLOPT_STDERR, $logfile);
     }
 
+    /**
+     * @param string $requestType
+     */
     public function setRequestType(string $requestType):void {
         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $requestType);
     }
 
+    /**
+     * @param array $data
+     */
     public function setRequestData(array $data):void {
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode($data));
     }
 
-    public function exec():string {
+    /**
+     * @return Response
+     */
+    public function exec():Response {
         $result = curl_exec($this->curl);
+        $httpStatus = curl_getinfo($this->curl)['http_code'];
 
         if($errno = curl_errno($this->curl)) {
-            var_dump($this->getErrorString($errno));
+            if($errno === 58) {
+                try {
+                    throw new CurlCertException("cURL has a problem with the certificate! Either the certificate is missing, malformed or the keyphrase is incorrect. Did you convert the .pfx file into a .pem file?");
+                } catch (CurlCertException $e) {
+                    echo "{$e->getMessage()}";
+                }
+            } else {
+                try {
+                    throw new CurlException("cURL has encountered a problem! The error was: {$this->getErrorString($errno)}");
+                } catch (CurlException $e) {
+                    echo "{$e->getMessage()}";
+                }
+            }
         }
 
         $this->close();
 
-        return $result;
+        return new Response($httpStatus, $result);
     }
 
+    /**
+     *
+     */
     public function close() {
         curl_close($this->curl);
     }
 
+    /**
+     * @param $errorNumber
+     * @return string
+     */
     public function getErrorString($errorNumber):string {
         return [
             1 => 'CURLE_UNSUPPORTED_PROTOCOL',

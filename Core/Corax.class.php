@@ -60,7 +60,7 @@ class Corax {
      * @param array $ids
      * @return string
      */
-    public function getDocumentById(array $ids):string {
+    public function getDocumentById(array $ids):Response {
         $iteration = 0;
         $rekeyedIds = [];
 
@@ -76,7 +76,7 @@ class Corax {
      * @param string $prefix
      * @return string
      */
-    public function getDocumentByPrefix(string $prefix):string {
+    public function getDocumentByPrefix(string $prefix):Response {
         return $this->executeQuery($this->buildUrl(['startsWith' => $prefix]), Corax::GET);
     }
 
@@ -96,7 +96,7 @@ class Corax {
             }
         }
 
-        if(strlen($this->getDocumentById([$id])) === 0) {
+        if($this->getDocumentById([$id])->getStatusCode() === 404) {
             return false;
         }
 
@@ -141,7 +141,7 @@ class Corax {
         return $this->executeQuery($this->buildQueryUrl(), Corax::POST, ['Query' => $query]);
     }
 
-    private function executeQuery(string $targetUrl, string $requestType, array $data = []):string {
+    private function executeQuery(string $targetUrl, string $requestType, array $data = []):Response {
         $curl = new Curl($targetUrl, $this->certPath, $this->certPass);
         $curl->setRequestType($requestType);
         $curl->setRequestData($data);
