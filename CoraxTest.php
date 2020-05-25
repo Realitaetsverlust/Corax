@@ -2,7 +2,7 @@
 ini_set('display_errors', true);
 error_reporting(E_ALL);
 
-require "Core/Corax.class.php";
+require_once 'vendor/autoload.php';
 
 use Realitaetsverlust\Corax\Core\Corax;
 
@@ -14,5 +14,5 @@ $corax = new Corax(
 );
 
 echo "<pre>";
-var_dump(json_decode($corax->getDocumentByPrefix('no')));
+var_dump($corax->documentExists('testdata'));
 echo "</pre>";

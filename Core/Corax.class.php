@@ -1,6 +1,8 @@
 <?php
 namespace Realitaetsverlust\Corax\Core;
 
+use Realitaetsverlust\Corax\Core\Exceptions\ParameterException;
+
 require "Curl.php";
 
 /**
@@ -59,6 +61,23 @@ class Corax {
         return $this->executeQuery($this->buildUrl(['startsWith' => $prefix]), Corax::GET);
     }
 
+    public function documentExists(string $id):bool {
+        if(strlen($id) === 0) {
+            try{
+                throw new ParameterException('\'documentExists() parameter 1 cannot be empty\'');
+            } catch(ParameterException $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        }
+
+        if(strlen($this->getDocumentById(['documentId' => $id])) === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getAllDocuments($startAt = null, $pageSize = null):string {
         $params = [];
 
@@ -73,7 +92,11 @@ class Corax {
         return $this->executeQuery($this->buildUrl($params), Corax::GET);
     }
 
-    public function putDocument(string $id, array $data):string {
+    public function putDocument(string $id, array $data, bool $checkExistence):string {
+/*        if($this->getDocumentById([$id]) === true) {
+
+        }*/
+
         return $this->executeQuery($this->buildUrl(["documentId" => $id]), Corax::PUT, $data);
     }
 
@@ -94,7 +117,6 @@ class Corax {
 
     private function buildUrl(array $buildParams = []):string {
         $baseUrl = "{$this->server}/databases/{$this->database}/docs?";
-
         $queryString = '';
         foreach($buildParams as $key => $value) {
             /*
@@ -106,7 +128,7 @@ class Corax {
              * the reason why I'm using "documentId" and not just "id" - that string can appear in
              * other params, so to avoid conflicts and wrong positives, I'm using documentId.
             */
-            if(strpos($key, "documentId") >= 1) {
+            if(strpos($key, "documentId") !== false) {
                 $key = "id";
             }
 
