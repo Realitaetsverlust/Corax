@@ -1,6 +1,7 @@
 <?php
 namespace Realitaetsverlust\Corax\Core;
 
+use Realitaetsverlust\Corax\Core\Exceptions\DuplicateIdException;
 use Realitaetsverlust\Corax\Core\Exceptions\ParameterException;
 
 require "Curl.php";
@@ -41,10 +42,10 @@ class Corax {
     /**
      * RavenDB constructor.
      *
-     * @param string $server
-     * @param string $database
-     * @param string $certPath
-     * @param string $certPass
+     * @param string $server address to the server
+     * @param string $database name of the database
+     * @param string $certPath path to the certificate
+     * @param string $certPass the password for the certfile (optional)
      */
     public function __construct(string $server, string $database, string $certPath = "", string $certPass = "") {
         $this->server = $server;
@@ -53,31 +54,62 @@ class Corax {
         $this->certPass = $certPass;
     }
 
+    /**
+     * Fetches one or more documents by ID
+     *
+     * @param array $ids
+     * @return string
+     */
     public function getDocumentById(array $ids):string {
-        return $this->executeQuery($this->buildUrl($ids), Corax::GET);
+        $iteration = 0;
+        $rekeyedIds = [];
+
+        foreach($ids as $id) {
+            $rekeyedIds["documentId{$iteration}"] = $id;
+        }
+
+        return $this->executeQuery($this->buildUrl($rekeyedIds), Corax::GET);
     }
 
+    /**
+     * Fetches all documents by prefix
+     * @param string $prefix
+     * @return string
+     */
     public function getDocumentByPrefix(string $prefix):string {
         return $this->executeQuery($this->buildUrl(['startsWith' => $prefix]), Corax::GET);
     }
 
+    /**
+     * checks if the given document exists
+     *
+     * @param string $id
+     * @return bool
+     */
     public function documentExists(string $id):bool {
         if(strlen($id) === 0) {
             try{
                 throw new ParameterException('\'documentExists() parameter 1 cannot be empty\'');
             } catch(ParameterException $e) {
-                echo $e->getMessage();
+                echo $e->getMessage() . $e->getFile() . ' in line ' . $e->getLine();
                 return false;
             }
         }
 
-        if(strlen($this->getDocumentById(['documentId' => $id])) === 0) {
+        if(strlen($this->getDocumentById([$id])) === 0) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Fetches every document in the database
+     *
+     * @param null $startAt how many docs to skip
+     * @param null $pageSize amount of docs to return
+     * @return string
+     */
     public function getAllDocuments($startAt = null, $pageSize = null):string {
         $params = [];
 
@@ -92,10 +124,15 @@ class Corax {
         return $this->executeQuery($this->buildUrl($params), Corax::GET);
     }
 
-    public function putDocument(string $id, array $data, bool $checkExistence):string {
-/*        if($this->getDocumentById([$id]) === true) {
-
-        }*/
+    public function putDocument(string $id, array $data, bool $checkExistence = true):bool {
+        if($checkExistence === true && $this->documentExists($id) === true) {
+            try {
+                throw new DuplicateIdException("The document with the ID {$id} already exists. Please set the param '\$checkExistence' to false to overwrite the document.");
+            } catch(DuplicateIdException $e) {
+                echo "{$e->getMessage()}";
+                return false;
+            }
+        }
 
         return $this->executeQuery($this->buildUrl(["documentId" => $id]), Corax::PUT, $data);
     }
@@ -128,7 +165,7 @@ class Corax {
              * the reason why I'm using "documentId" and not just "id" - that string can appear in
              * other params, so to avoid conflicts and wrong positives, I'm using documentId.
             */
-            if(strpos($key, "documentId") !== false) {
+            if(strpos($key, "documentId") === 0) {
                 $key = "id";
             }
 

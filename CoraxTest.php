@@ -14,5 +14,5 @@ $corax = new Corax(
 );
 
 echo "<pre>";
-var_dump($corax->documentExists('testdata'));
+var_dump($corax->putDocument('testdata/1', ['data' => 'test'], false));
 echo "</pre>";
