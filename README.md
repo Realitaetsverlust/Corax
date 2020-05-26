@@ -18,13 +18,24 @@ This library is not finished by any means necessary. If you stumble across it fo
 
 Opening a Corax-Instance is fairly simple:
 ```
-$corax = new Corax('path/to/config.yaml');
+$corax = new Corax('path/to/config.yml');
+```
+
+The config.yml consists out of one top level node and 4 sub nodes:
+
+```
+config:
+  serverAddress: 'https://serveraddress:port'
+  database: 'exampledatabase'
+  certFilePath: 'path/to/certfile'
+  certFilePassword: 'passphrase for certfile'
 ```
 
 There are a few things to note here:
 
 1. The server URL has to be the same as the one you'd use in your browser to access RavenDB Studio. Corax builds the necessary URLs by itself.
 2. By default, RavenDB provides a .pfx file as client certificate. This is NOT compatible with cURL. You have to convert that .pfx file into a .pem file. This can be done with OpenSSL executing the command ``openssl pkcs12 -in your_certfile.pfx -out your_new_shiny_certfile.pem -clcerts``. OpenSSL will ask for a keyphrase, you can either omit that or use, whatever you prefer.
+3. Do NOT store the certificate within the webroot! Certfiles are considered as text file by a browser, therefore they can be accessed quite simply.
 
 Corax currently supports 4 operations:
 

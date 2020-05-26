@@ -52,7 +52,7 @@ class Corax {
         
         $this->server = $config['serverAddress'];
         $this->database = $config['database'];
-        $this->certPath = getcwd()."/".$config['certFilePath'];
+        $this->certPath = $config['certFilePath'];
         $this->certPass = $config['certFilePassword'];
     }
 
