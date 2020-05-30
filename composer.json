@@ -1,5 +1,5 @@
 {
-  "name": "Realitaetsverlust/Corax",
+  "name": "realitaetsverlust/corax",
   "type": "library",
   "description": "A RavenDB-Connector for PHP utilizing the REST-API",
   "keywords": ["database", "ravendb"],
